@@ -1,0 +1,10 @@
+# Users app
+
+Aplicación para mantener lo relacionado a los usuarios en el proyecto. 
+
+## Instalación
+
+1. Clonar el repo
+2. docker-compose up -d --build
+3. La aplicación queda disponible en http://localhost:8000
+
