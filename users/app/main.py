@@ -24,6 +24,7 @@ class AuthUserInput(BaseModel):
     password: str
 
 
+
 @app.post("/users")
 async def register(input_data: RegisterUserInput,status_code=status.HTTP_201_CREATED):
     response = register_user_db(
