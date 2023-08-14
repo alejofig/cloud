@@ -2,6 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
+#from .user import Usuario
 
 DB_USER=os.getenv("DB_USER","example")
 DB_PASSWORD= os.getenv("DB_PASSWORD","example")
@@ -19,7 +20,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 async def init_db():
     try:
-
         Base.metadata.create_all(bind=engine)
     except Exception as e:
         raise e
+    

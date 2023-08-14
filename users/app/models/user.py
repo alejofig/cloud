@@ -48,6 +48,8 @@ class EstadoUsuario(enum.Enum):
 
 
 class Usuario(Base):
+    def as_dict(self):
+       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
     __tablename__ = "usuarios"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     username = Column(String, unique=True, nullable=False)
@@ -67,6 +69,12 @@ def authenticate_user(username: str, password: str):
     db = SessionLocal()
     user = db.query(Usuario).filter(Usuario.username == username).first()
     if user and verify_password(password, user.password):
+        return user
+
+def get_user_by_token(token: str):
+    db = SessionLocal()
+    user = db.query(Usuario).filter(Usuario.token == token).first()
+    if user:
         return user
 
 def register_user_db(

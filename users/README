@@ -7,4 +7,6 @@ Aplicación para mantener lo relacionado a los usuarios en el proyecto.
 1. Clonar el repo
 2. docker-compose up -d --build
 3. La aplicación queda disponible en http://localhost:8000
+4. Correr pruebas coverage run -m pytest tests/* -v
+5. Para que falle según el coverage coverage report --fail-under=70
 
