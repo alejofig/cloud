@@ -1,9 +1,10 @@
 import uuid
 from fastapi import FastAPI, Depends,HTTPException, status,Header
+from .schemas.user import UserUpdate
 from .schemas.user import UserResponse,  RegisterUserInput,AuthUserInput
 from .models.database import SessionLocal
 from fastapi.security import OAuth2PasswordRequestForm
-from .models.user import EstadoUsuario, Usuario, authenticate_user, create_access_token, register_user_db, update_user_token_in_database, get_user_by_token
+from .models.user import EstadoUsuario, Usuario, authenticate_user, register_user_db, update_user_token_in_database, get_user_by_token
 from datetime import datetime
 from .models.database import init_db
 from datetime import timedelta
@@ -47,6 +48,22 @@ async def on_startup():
 @app.get("/users/ping")
 def read_root():
     return "pong"
+
+@app.patch("/users/{user_id}", response_model=dict)
+async def update_user(user_id: str, user_update: UserUpdate):
+    db= SessionLocal()
+    user = db.query(Usuario).filter(Usuario.id == user_id).first()
+    if not user:
+        db.close()  
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    for field, value in user_update.dict(exclude_unset=True).items():
+        setattr(user, field, value)
+
+    db.commit()  
+    db.close()  
+    
+    return {"msg": "El usuario ha sido actualizado"}
+    
 
 @app.post("/users/reset")
 async def reset_database():

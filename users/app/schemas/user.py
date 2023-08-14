@@ -9,6 +9,11 @@ class UserResponse(BaseModel):
     phoneNumber: str = None
     status: str = None
     
+class UserUpdate(BaseModel):
+    status: str = ""
+    dni: str = ""
+    fullName: str = ""
+    phoneNumber: str = ""    
 
 class RegisterUserInput(BaseModel):
     username: str
