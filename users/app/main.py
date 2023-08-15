@@ -1,3 +1,4 @@
+from typing import Optional
 import uuid
 from fastapi import FastAPI, Depends,HTTPException, status,Header
 from .schemas.user import UserUpdate
@@ -24,10 +25,10 @@ async def register(input_data: RegisterUserInput,status_code=status.HTTP_201_CRE
     return response
 
 @app.post("/users/auth")
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
-    if not form_data.username  or not form_data.password:
+async def login_for_access_token(input_data: AuthUserInput):
+    if not input_data.username  or not input_data.password:
         raise HTTPException(status_code=400, detail="Missing required fields")
-    user = authenticate_user(form_data.username, form_data.password)
+    user = authenticate_user(input_data.username, input_data.password)
     if not user:
         raise HTTPException(
             status_code=404,
@@ -51,6 +52,9 @@ def read_root():
 
 @app.patch("/users/{user_id}", response_model=dict)
 async def update_user(user_id: str, user_update: UserUpdate):
+    if all(value is None for value in user_update.dict().values()):
+        raise HTTPException(status_code=400, detail="Al menos un campo debe estar presente en la solicitud")
+
     db= SessionLocal()
     user = db.query(Usuario).filter(Usuario.id == user_id).first()
     if not user:
@@ -62,7 +66,7 @@ async def update_user(user_id: str, user_update: UserUpdate):
     db.commit()  
     db.close()  
     
-    return {"msg": "El usuario ha sido actualizado"}
+    return {"msg": "el usuario ha sido actualizado"}
     
 
 @app.post("/users/reset")
@@ -75,9 +79,9 @@ async def reset_database():
     except Exception as e:
         raise e
 
-def get_user_info(authorization: str = Header(...)):
+def get_user_info(authorization: Optional[str] = Header(None)):
     if authorization is None or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=403, detail=f"{authorization} El token no está en el encabezado de la solicitud")
+        raise HTTPException(status_code=403, detail=f"El token no está en el encabezado de la solicitud")
     token = authorization.split(" ")[1]
     user = get_user_by_token(token)
     if not user:
@@ -88,7 +92,7 @@ def get_user_info(authorization: str = Header(...)):
 def read_user_info(user: dict = Depends(get_user_info)):
     user.id = str(user.id)
     user.status = user.status.value
-    return user
+    return user.as_dict()
 
 def get_db():
     db = SessionLocal()

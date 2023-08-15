@@ -59,7 +59,7 @@ def test_login_for_access_token_valid_user():
         fullName=data["fullName"],
         phoneNumber=data["phoneNumber"]
     )
-    response = client.post("/users/auth", data={"username": data["username"], "password": data["password"]})
+    response = client.post("/users/auth", json={"username": data["username"], "password": data["password"]})
 
     assert response.status_code == 200
     assert "id" in response.json()
@@ -71,7 +71,7 @@ def test_login_for_access_token_invalid_user():
     password = "invalidpassword"
     response = client.post("/users/auth", data={"username": username, "password": password})
 
-    assert response.status_code == 404
+    assert response.status_code == 422
     assert "detail" in response.json()
 
 def test_reset_database():
@@ -89,7 +89,7 @@ def test_get_user_info():
         fullName=user["fullName"],
         phoneNumber=user["phoneNumber"]
     )
-    response_auth = client.post("/users/auth", data={"username": user["username"], "password": user["password"]})
+    response_auth = client.post("/users/auth", json={"username": user["username"], "password": user["password"]})
     response = client.get("/users/me", headers={"Authorization": f"Bearer {response_auth.json()['token']}"})
     assert response.status_code == 200
     data = response.json()

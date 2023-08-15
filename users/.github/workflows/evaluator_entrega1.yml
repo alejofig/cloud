@@ -1,0 +1,176 @@
+name: Evaluator_Entrega1
+on: workflow_dispatch
+jobs:
+  evaluate_users:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '16.x'
+          registry-url: https://registry.npmjs.org/
+      - name: Set up yq
+        uses: mikefarah/yq@v4.30.8
+      - name: Save folder name to env variable
+        run: echo "CONFIG_PATH=$(yq '.user-management.folder' config.yaml)" >> $GITHUB_ENV
+      - name: Save port to env variable
+        run: echo "CONFIG_PORT=$(yq '.user-management.port' config.yaml)" >> $GITHUB_ENV
+      - name: Install newman
+        run: npm install -g newman
+      - name: Create evaluator folder
+        run: mkdir .evaluator
+      - name: Download docker compose validator
+        uses: wei/curl@master
+        with:
+          args: https://raw.githubusercontent.com/MISW-4301-Desarrollo-Apps-en-la-Nube/monitor-202314/main/entrega1/users-docker-compose.yml --output .evaluator/users-docker-compose.yml
+      - name: Download Postman collection
+        uses: wei/curl@master
+        with:
+          args: https://raw.githubusercontent.com/MISW-4301-Desarrollo-Apps-en-la-Nube/monitor-202314/main/entrega1/entrega1.json --output .evaluator/entrega1.json
+      - name: Start containers
+        run: docker-compose -f ".evaluator/users-docker-compose.yml" up -d
+      - name: Check healthchecks
+        uses: jtalk/url-health-check-action@v3
+        with:
+          url: http://localhost:3003/offers/ping|http://localhost:3001/posts/ping|http://localhost:3002/routes/ping|http://localhost:3000/users/ping
+          follow-redirect: false
+          max-attempts: 5
+          retry-delay: 3s
+          retry-all: true
+      - name: Run the API and Postman's tests
+        run: newman run ".evaluator/entrega1.json" --verbose
+  evaluate_routes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '16.x'
+          registry-url: https://registry.npmjs.org/
+      - name: Set up yq
+        uses: mikefarah/yq@v4.30.8
+      - name: Save folder name to env variable
+        run: echo "CONFIG_PATH=$(yq '.route-management.folder' config.yaml)" >> $GITHUB_ENV
+      - name: Install newman
+        run: npm install -g newman
+      - name: Create evaluator folder
+        run: mkdir .evaluator
+      - name: Download docker compose validator
+        uses: wei/curl@master
+        with:
+          args: https://raw.githubusercontent.com/MISW-4301-Desarrollo-Apps-en-la-Nube/monitor-202314/main/entrega1/routes-docker-compose.yml --output .evaluator/routes-docker-compose.yml
+      - name: Download Postman collection
+        uses: wei/curl@master
+        with:
+          args: https://raw.githubusercontent.com/MISW-4301-Desarrollo-Apps-en-la-Nube/monitor-202314/main/entrega1/entrega1.json --output .evaluator/entrega1.json
+      - name: Start containers
+        run: docker-compose -f ".evaluator/routes-docker-compose.yml" up -d
+      - name: Check healthchecks
+        uses: jtalk/url-health-check-action@v3
+        with:
+          url: http://localhost:3003/offers/ping|http://localhost:3001/posts/ping|http://localhost:3002/routes/ping|http://localhost:3000/users/ping
+          follow-redirect: false
+          max-attempts: 5
+          retry-delay: 3s
+          retry-all: true
+      - name: Run the API and Postman's tests
+        run: newman run ".evaluator/entrega1.json" --verbose
+  evaluate_posts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '16.x'
+          registry-url: https://registry.npmjs.org/
+      - name: Set up yq
+        uses: mikefarah/yq@v4.30.8
+      - name: Save folder name to env variable
+        run: echo "CONFIG_PATH=$(yq '.post-management.folder' config.yaml)" >> $GITHUB_ENV
+      - name: Install newman
+        run: npm install -g newman
+      - name: Create evaluator folder
+        run: mkdir .evaluator
+      - name: Download docker compose validator
+        uses: wei/curl@master
+        with:
+          args: https://raw.githubusercontent.com/MISW-4301-Desarrollo-Apps-en-la-Nube/monitor-202314/main/entrega1/posts-docker-compose.yml --output .evaluator/posts-docker-compose.yml
+      - name: Download Postman collection
+        uses: wei/curl@master
+        with:
+          args: https://raw.githubusercontent.com/MISW-4301-Desarrollo-Apps-en-la-Nube/monitor-202314/main/entrega1/entrega1.json --output .evaluator/entrega1.json
+      - name: Start containers
+        run: docker-compose -f ".evaluator/posts-docker-compose.yml" up -d
+      - name: Check healthchecks
+        uses: jtalk/url-health-check-action@v3
+        with:
+          url: http://localhost:3003/offers/ping|http://localhost:3001/posts/ping|http://localhost:3002/routes/ping|http://localhost:3000/users/ping
+          follow-redirect: false
+          max-attempts: 5
+          retry-delay: 3s
+          retry-all: true
+      - name: Run the API and Postman's tests
+        run: newman run ".evaluator/entrega1.json" --verbose
+  evaluate_offers:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '16.x'
+          registry-url: https://registry.npmjs.org/
+      - name: Set up yq
+        uses: mikefarah/yq@v4.30.8
+      - name: Save folder name to env variable
+        run: echo "CONFIG_PATH=$(yq '.offer-management.folder' config.yaml)" >> $GITHUB_ENV
+      - name: Install newman
+        run: npm install -g newman
+      - name: Create evaluator folder
+        run: mkdir .evaluator
+      - name: Download docker compose validator
+        uses: wei/curl@master
+        with:
+          args: https://raw.githubusercontent.com/MISW-4301-Desarrollo-Apps-en-la-Nube/monitor-202314/main/entrega1/offers-docker-compose.yml --output .evaluator/offers-docker-compose.yml
+      - name: Download Postman collection
+        uses: wei/curl@master
+        with:
+          args: https://raw.githubusercontent.com/MISW-4301-Desarrollo-Apps-en-la-Nube/monitor-202314/main/entrega1/entrega1.json --output .evaluator/entrega1.json
+      - name: Start containers
+        run: docker-compose -f ".evaluator/offers-docker-compose.yml" up -d
+      - name: Check healthchecks
+        uses: jtalk/url-health-check-action@v3
+        with:
+          url: http://localhost:3003/offers/ping|http://localhost:3001/posts/ping|http://localhost:3002/routes/ping|http://localhost:3000/users/ping
+          follow-redirect: false
+          max-attempts: 5
+          retry-delay: 3s
+          retry-all: true
+      - name: Run the API and Postman's tests
+        run: newman run ".evaluator/entrega1.json" --verbose
+  evaluate_networks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@359bebbc29cbe6c87da6bc9ea3bc930432750108
+        with:
+          ruby-version: '3.1'
+      - name: Create evaluator folder
+        run: mkdir .evaluator
+      - name: Download network validator
+        uses: wei/curl@master
+        with:
+          args: https://raw.githubusercontent.com/MISW-4301-Desarrollo-Apps-en-la-Nube/monitor-202314/main/entrega1/networks.rb --output .evaluator/networks.rb
+      - name: Install yaml
+        run: gem install yaml
+      - name: Validate networks
+        run: ruby .evaluator/networks.rb
